@@ -3,26 +3,29 @@ const {
   handleDefaultStreamResponseV2,
 } = require("../../helpers/chat/responses");
 
-class MistralLLM {
-  constructor(embedder = null, modelPreference = null) {
-    if (!process.env.MISTRAL_API_KEY)
-      throw new Error("No Mistral API key was set.");
+function fireworksAiModels() {
+  const { MODELS } = require("./models.js");
+  return MODELS || {};
+}
 
+class FireworksAiLLM {
+  constructor(embedder = null, modelPreference = null) {
+    if (!process.env.FIREWORKS_AI_LLM_API_KEY)
+      throw new Error("No FireworksAI API key was set.");
     const { OpenAI: OpenAIApi } = require("openai");
     this.openai = new OpenAIApi({
-      baseURL: "https://api.mistral.ai/v1",
-      apiKey: process.env.MISTRAL_API_KEY ?? null,
+      baseURL: "https://api.fireworks.ai/inference/v1",
+      apiKey: process.env.FIREWORKS_AI_LLM_API_KEY ?? null,
     });
-    this.model =
-      modelPreference || process.env.MISTRAL_MODEL_PREF || "mistral-tiny";
+    this.model = modelPreference || process.env.FIREWORKS_AI_LLM_MODEL_PREF;
     this.limits = {
       history: this.promptWindowLimit() * 0.15,
       system: this.promptWindowLimit() * 0.15,
       user: this.promptWindowLimit() * 0.7,
     };
 
-    this.embedder = embedder ?? new NativeEmbedder();
-    this.defaultTemp = 0.0;
+    this.embedder = !embedder ? new NativeEmbedder() : embedder;
+    this.defaultTemp = 0.7;
   }
 
   #appendContext(contextTexts = []) {
@@ -37,70 +40,48 @@ class MistralLLM {
     );
   }
 
+  allModelInformation() {
+    return fireworksAiModels();
+  }
+
   streamingEnabled() {
     return "streamGetChatCompletion" in this;
   }
 
-  static promptWindowLimit() {
-    return 32000;
+  static promptWindowLimit(modelName) {
+    const availableModels = fireworksAiModels();
+    return availableModels[modelName]?.maxLength || 4096;
   }
 
+  // Ensure the user set a value for the token limit
+  // and if undefined - assume 4096 window.
   promptWindowLimit() {
-    return 32000;
+    const availableModels = this.allModelInformation();
+    return availableModels[this.model]?.maxLength || 4096;
   }
 
-  async isValidChatCompletionModel(modelName = "") {
-    return true;
+  async isValidChatCompletionModel(model = "") {
+    const availableModels = this.allModelInformation();
+    return availableModels.hasOwnProperty(model);
   }
 
-  /**
-   * Generates appropriate content array for a message + attachments.
-   * @param {{userPrompt:string, attachments: import("../../helpers").Attachment[]}}
-   * @returns {string|object[]}
-   */
-  #generateContent({ userPrompt, attachments = [] }) {
-    if (!attachments.length) return userPrompt;
-
-    const content = [{ type: "text", text: userPrompt }];
-    for (let attachment of attachments) {
-      content.push({
-        type: "image_url",
-        image_url: attachment.contentString,
-      });
-    }
-    return content.flat();
-  }
-
-  /**
-   * Construct the user prompt for this model.
-   * @param {{attachments: import("../../helpers").Attachment[]}} param0
-   * @returns
-   */
   constructPrompt({
     systemPrompt = "",
     contextTexts = [],
     chatHistory = [],
     userPrompt = "",
-    attachments = [], // This is the specific attachment for only this prompt
   }) {
     const prompt = {
       role: "system",
       content: `${systemPrompt}${this.#appendContext(contextTexts)}`,
     };
-    return [
-      prompt,
-      ...chatHistory,
-      {
-        role: "user",
-        content: this.#generateContent({ userPrompt, attachments }),
-      },
-    ];
+    return [prompt, ...chatHistory, { role: "user", content: userPrompt }];
   }
 
   async getChatCompletion(messages = null, { temperature = 0.7 }) {
     if (!(await this.isValidChatCompletionModel(this.model)))
       throw new Error(
-        `Mistral chat: ${this.model} is not valid for chat completion!`
+        `FireworksAI chat: ${this.model} is not valid for chat completion!`
       );
 
     const result = await this.openai.chat.completions.create({
@@ -117,7 +98,7 @@ class MistralLLM {
   async streamGetChatCompletion(messages = null, { temperature = 0.7 }) {
     if (!(await this.isValidChatCompletionModel(this.model)))
       throw new Error(
-        `Mistral chat: ${this.model} is not valid for chat completion!`
+        `FireworksAI chat: ${this.model} is not valid for chat completion!`
       );
 
     const streamRequest = await this.openai.chat.completions.create({
@@ -149,5 +130,6 @@ class MistralLLM {
 }
 
 module.exports = {
-  MistralLLM,
+  FireworksAiLLM,
+  fireworksAiModels,
 };
