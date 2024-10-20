@@ -4,22 +4,17 @@ const InheritMultiple = require("./helpers/classes.js");
 const UnTooled = require("./helpers/untooled.js");
 
 /**
- * The agent provider for the LMStudio.
+ * The agent provider for the OpenRouter provider.
  */
-class LMStudioProvider extends InheritMultiple([Provider, UnTooled]) {
+class ApiPieProvider extends InheritMultiple([Provider, UnTooled]) {
   model;
 
-  /**
-   *
-   * @param {{model?: string}} config
-   */
   constructor(config = {}) {
+    const { model = "openrouter/llama-3.1-8b-instruct" } = config;
     super();
-    const model =
-      config?.model || process.env.LMSTUDIO_MODEL_PREF || "Loaded from Chat UI";
     const client = new OpenAI({
-      baseURL: process.env.LMSTUDIO_BASE_PATH?.replace(/\/+$/, ""), // here is the URL to your LMStudio instance
-      apiKey: null,
+      baseURL: "https://apipie.ai/v1",
+      apiKey: process.env.APIPIE_LLM_API_KEY,
       maxRetries: 3,
     });
 
@@ -41,9 +36,9 @@ class LMStudioProvider extends InheritMultiple([Provider, UnTooled]) {
       })
       .then((result) => {
         if (!result.hasOwnProperty("choices"))
-          throw new Error("LMStudio chat: No results!");
+          throw new Error("ApiPie chat: No results!");
         if (result.choices.length === 0)
-          throw new Error("LMStudio chat: No results length!");
+          throw new Error("ApiPie chat: No results length!");
         return result.choices[0].message.content;
       })
       .catch((_) => {
@@ -112,11 +107,10 @@ class LMStudioProvider extends InheritMultiple([Provider, UnTooled]) {
    *
    * @param _usage The completion to get the cost for.
    * @returns The cost of the completion.
-   * Stubbed since LMStudio has no cost basis.
    */
   getCost(_usage) {
     return 0;
   }
 }
 
-module.exports = LMStudioProvider;
+module.exports = ApiPieProvider;
