@@ -6,6 +6,7 @@ import { Plus } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 
 export default function CustomLogo() {
+  const { t } = useTranslation();
   const { logo: _initLogo, setLogo: _setLogo } = useLogo();
   const [logo, setLogo] = useState("");
   const [isDefaultLogo, setIsDefaultLogo] = useState(true);
@@ -66,18 +67,15 @@ export default function CustomLogo() {
   const triggerFileInputClick = () => {
     fileInputRef.current?.click();
   };
-  const { t } = useTranslation();
 
   return (
-    <div className="mt-6 mb-8">
-      <div className="flex flex-col gap-y-1">
-        <h2 className="text-base leading-6 font-bold text-theme-text-primary">
-          {t("appearance.logo.title")}
-        </h2>
-        <p className="text-xs leading-[18px] font-base text-theme-text-secondary">
-          {t("appearance.logo.description")}
-        </p>
-      </div>
+    <div className="flex flex-col gap-y-0.5 my-4">
+      <h2 className="text-sm leading-6 font-semibold text-white">
+        {t("customization.items.logo.title")}
+      </h2>
+      <p className="text-xs text-white/60">
+        {t("customization.items.logo.description")}
+      </p>
       {isDefaultLogo ? (
         <div className="flex md:flex-row flex-col items-center">
           <div className="flex flex-row gap-x-8">
@@ -101,10 +99,10 @@ export default function CustomLogo() {
                     <Plus className="w-6 h-6 text-black/80 m-2" />
                   </div>
                   <div className="text-theme-text-primary text-opacity-80 text-sm font-semibold py-1">
-                    {t("appearance.logo.add")}
+                    {t("customization.items.logo.add")}
                   </div>
                   <div className="text-theme-text-secondary text-opacity-60 text-xs font-medium py-1">
-                    {t("appearance.logo.recommended")}
+                    {t("customization.items.logo.recommended")}
                   </div>
                 </div>
               </div>
@@ -125,7 +123,7 @@ export default function CustomLogo() {
                 onClick={triggerFileInputClick}
                 className="text-[#FFFFFF] text-base font-medium hover:text-opacity-60 mx-2"
               >
-                {t("appearance.logo.replace")}
+                {t("customization.items.logo.replace")}
               </button>
 
               <input
@@ -140,7 +138,7 @@ export default function CustomLogo() {
                 onClick={handleRemoveLogo}
                 className="text-[#FFFFFF] text-base font-medium hover:text-opacity-60 mx-2"
               >
-                {t("appearance.logo.remove")}
+                {t("customization.items.logo.remove")}
               </button>
             </div>
           </div>

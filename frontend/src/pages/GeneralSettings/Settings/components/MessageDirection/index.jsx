@@ -1,16 +1,18 @@
 import { useChatMessageAlignment } from "@/hooks/useChatMessageAlignment";
 import { Tooltip } from "react-tooltip";
+import { useTranslation } from "react-i18next";
 
 export function MessageDirection() {
+  const { t } = useTranslation();
   const { msgDirection, setMsgDirection } = useChatMessageAlignment();
 
   return (
-    <div className="flex flex-col gap-y-1 mt-4">
-      <h2 className="text-base leading-6 font-bold text-white">
-        Message Chat Alignment
+    <div className="flex flex-col gap-y-0.5 my-4">
+      <h2 className="text-sm leading-6 font-semibold text-white">
+        {t("customization.items.chat-message-alignment.title")}
       </h2>
-      <p className="text-xs leading-[18px] font-base text-white/60">
-        Select the message alignment mode when using the chat interface.
+      <p className="text-xs text-white/60">
+        {t("customization.items.chat-message-alignment.description")}
       </p>
       <div className="flex flex-row flex-wrap gap-x-4 pt-1 gap-y-4 md:gap-y-0">
         <ItemDirection

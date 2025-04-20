@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function CustomMessages() {
+  const { t } = useTranslation();
   const [hasChanges, setHasChanges] = useState(false);
   const [messages, setMessages] = useState([]);
-  const { t } = useTranslation();
 
   useEffect(() => {
     async function fetchMessages() {
@@ -22,12 +22,18 @@ export default function CustomMessages() {
     if (type === "user") {
       setMessages([
         ...messages,
-        { user: t("appearance.message.double-click"), response: "" },
+        {
+          user: t("customization.items.welcome-messages.double-click"),
+          response: "",
+        },
       ]);
     } else {
       setMessages([
         ...messages,
-        { user: "", response: t("appearance.message.double-click") },
+        {
+          user: "",
+          response: t("customization.items.welcome-messages.double-click"),
+        },
       ]);
     }
   };
@@ -55,16 +61,14 @@ export default function CustomMessages() {
   };
 
   return (
-    <div className="mb-8">
-      <div className="flex flex-col gap-y-1">
-        <h2 className="text-base leading-6 font-bold text-white">
-          {t("appearance.message.title")}
-        </h2>
-        <p className="text-xs leading-[18px] font-base text-white/60">
-          {t("appearance.message.description")}
-        </p>
-      </div>
-      <div className="mt-3 flex flex-col gap-y-6 bg-theme-settings-input-bg rounded-lg pr-[31px] pl-[12px] pt-4 max-w-[700px]">
+    <div className="flex flex-col gap-y-0.5 my-4">
+      <h2 className="text-sm leading-6 font-semibold text-white">
+        {t("customization.items.welcome-messages.title")}
+      </h2>
+      <p className="text-xs text-white/60">
+        {t("customization.items.welcome-messages.description")}
+      </p>
+      <div className="mt-2 flex flex-col gap-y-6 bg-theme-settings-input-bg rounded-lg pr-[31px] pl-[12px] pt-4 max-w-[700px]">
         {messages.map((message, index) => (
           <div key={index} className="flex flex-col gap-y-2">
             {message.user && (
@@ -95,11 +99,11 @@ export default function CustomMessages() {
             <div className="flex items-center justify-start text-sm font-normal -ml-2">
               <Plus className="m-2" size={16} weight="bold" />
               <span className="leading-5">
-                {t("appearance.message.new")}{" "}
+                {t("customization.items.welcome-messages.new")}{" "}
                 <span className="font-bold italic mr-1">
-                  {t("appearance.message.system")}
+                  {t("customization.items.welcome-messages.system")}
                 </span>{" "}
-                {t("appearance.message.message")}
+                {t("customization.items.welcome-messages.message")}
               </span>
             </div>
           </button>
@@ -110,23 +114,23 @@ export default function CustomMessages() {
             <div className="flex items-center justify-start text-sm font-normal">
               <Plus className="m-2" size={16} weight="bold" />
               <span className="leading-5">
-                {t("appearance.message.new")}{" "}
+                {t("customization.items.welcome-messages.new")}{" "}
                 <span className="font-bold italic mr-1">
-                  {t("appearance.message.user")}
+                  {t("customization.items.welcome-messages.user")}
                 </span>{" "}
-                {t("appearance.message.message")}
+                {t("customization.items.welcome-messages.message")}
               </span>
             </div>
           </button>
         </div>
       </div>
       {hasChanges && (
-        <div className="flex justify-start pt-6">
+        <div className="flex justify-start pt-2">
           <button
             className="transition-all duration-300 border border-slate-200 px-4 py-2 rounded-lg text-white text-sm items-center flex gap-x-2 hover:bg-slate-200 hover:text-slate-800 focus:ring-gray-800"
             onClick={handleMessageSave}
           >
-            {t("appearance.message.save")}
+            {t("customization.items.welcome-messages.save")}
           </button>
         </div>
       )}
